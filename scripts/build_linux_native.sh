@@ -4,6 +4,7 @@ SHARED_LIB="ON"
 OPENMP="ON"
 OPENCL="OFF"
 QUANTIZATION="OFF"
+DEBUG_MODE="OFF"
 CC=gcc
 CXX=g++
 
@@ -12,8 +13,18 @@ then
     TNN_ROOT_PATH=$(cd `dirname $0`; pwd)/..
 fi
 
-mkdir build_linux_native
-cd build_linux_native
+set -euo pipefail
+
+BUILD_DIR=${TNN_ROOT_PATH}/scripts/build_linux_x86_cpu_native
+TNN_INSTALL_DIR=${TNN_ROOT_PATH}/scripts/release_linux_x86_cpu_native
+
+if [ -d ${BUILD_DIR} ]
+then
+    rm -rf ${BUILD_DIR}
+fi 
+
+mkdir -p ${BUILD_DIR}
+cd ${BUILD_DIR}
 
 cmake ${TNN_ROOT_PATH} \
     -DCMAKE_SYSTEM_NAME=Linux  \
@@ -26,9 +37,22 @@ cmake ${TNN_ROOT_PATH} \
     -DTNN_OPENCL_ENABLE:BOOL=$OPENCL \
     -DTNN_QUANTIZATION_ENABLE:BOOL=$QUANTIZATION \
     -DTNN_BENCHMARK_MODE=ON \
-    -DTNN_BUILD_SHARED:BOOL=$SHARED_LIB 
+    -DTNN_BUILD_SHARED:BOOL=$SHARED_LIB \
+    -DDEBUG=${DEBUG_MODE}
 
-make -j7
+make -j8
+
+cd ${BUILD_DIR}
+mkdir -p ${TNN_INSTALL_DIR}/lib
+mkdir -p ${TNN_INSTALL_DIR}/bin
+if [ -d ${TNN_INSTALL_DIR}/include ]
+then
+    rm -rf ${TNN_INSTALL_DIR}/include
+fi 
+
+cp -RP ${TNN_ROOT_PATH}/include ${TNN_INSTALL_DIR}/
+cp -P libTNN.so* ${TNN_INSTALL_DIR}/lib
+cp test/TNNTest ${TNN_INSTALL_DIR}/bin
 
 # check compile error, or ci will not stop
 if [ 0 -ne $? ]

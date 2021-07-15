@@ -7,9 +7,11 @@ fi
 
 set -euo pipefail
 
-BUILD_DIR=${TNN_ROOT_PATH}/scripts/build_linux
-TNN_INSTALL_DIR=${TNN_ROOT_PATH}/scripts/linux_release
+BUILD_DIR=${TNN_ROOT_PATH}/scripts/build_linux_x86_cpu_openvino
+TNN_INSTALL_DIR=${TNN_ROOT_PATH}/scripts/release_linux_x86_cpu_openvino
 OPENVINO_BUILD_SHARED="ON"
+DEBUG_MODE="OFF"
+OPENMP="ON"
 
 OPENVINO_INSTALL_PATH=${BUILD_DIR}/openvinoInstallShared
 if [ "${OPENVINO_BUILD_SHARED}" = "OFF" ]
@@ -89,7 +91,7 @@ build_openvino() {
         -DTREAT_WARNING_AS_ERROR=OFF \
 
         echo "Building Openvino ..."
-        make -j4
+        make -j8
         make install
     fi
 }
@@ -180,15 +182,17 @@ cmake ${TNN_ROOT_PATH} \
     -DTNN_X86_ENABLE=ON \
     -DTNN_OPENVINO_ENABLE=ON \
     -DTNN_OPENVINO_BUILD_SHARED=${OPENVINO_BUILD_SHARED} \
-    -DTNN_CUDA_ENABLE=ON \
-    -DTNN_TENSORRT_ENABLE=ON \
+    -DTNN_OPENMP_ENABLE=${OPENMP} \
+    -DTNN_CUDA_ENABLE=OFF \
+    -DTNN_TENSORRT_ENABLE=OFF \
     -DTNN_TEST_ENABLE=ON \
     -DTNN_BENCHMARK_MODE=OFF \
     -DTNN_BUILD_SHARED=ON \
-    -DTNN_CONVERTER_ENABLE=OFF
+    -DTNN_CONVERTER_ENABLE=OFF \
+    -DDEBUG=${DEBUG_MODE}
 
 echo "Building TNN ..."
-make -j4
+make -j8
 
 if [ 0 -ne $? ]
 then
