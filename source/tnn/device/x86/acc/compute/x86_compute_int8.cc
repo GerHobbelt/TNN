@@ -62,6 +62,7 @@ namespace TNN_NS {
 void X86AVXGemmInt8Unit4x4(const int8_t* src, const int8_t* weight, int8_t* dst, long src_w_step, long dst_depth, long cdiv8,
                      const float* scale, const int32_t* bias, long relu, const int8_t* add_input,
                      const float* add_scale, const int8_t* relu6_max) {
+#ifdef __AVX2__
     DeclareRounding();
     __m128i zero_i8 = _mm_setzero_si128();
     __m128 relu6_max_vec;
@@ -172,6 +173,7 @@ void X86AVXGemmInt8Unit4x4(const int8_t* src, const int8_t* weight, int8_t* dst,
         }
         F32X4TOI8X4(dst_4x32, dst_x);
     }
+#endif
 }
 
 void X86SSEGemmInt8Unit4x4(const int8_t* src, const int8_t* weight, int8_t* dst, long src_w_step, long dst_depth, long cdiv8,

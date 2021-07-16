@@ -19,7 +19,7 @@
 #include "tnn/device/x86/acc/sse_mathfun.h"
 
 #if defined(__GNUC__) && !defined(__llvm__)
-#if __GNUC__ < 5
+#if __GNUC__ < 5 && defined(__AVX2__)
 #include "tnn/device/arm/acc/TNNVector.h"
 #define VEC_NAIVE_IMPL
 #endif

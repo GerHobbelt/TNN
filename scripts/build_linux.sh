@@ -7,11 +7,13 @@ fi
 
 set -euo pipefail
 
-BUILD_DIR=${TNN_ROOT_PATH}/scripts/build_linux_x86_cpu_openvino
-TNN_INSTALL_DIR=${TNN_ROOT_PATH}/scripts/release_linux_x86_cpu_openvino
+BUILD_DIR=${TNN_ROOT_PATH}/scripts/build_linux_x86_cpu_openvino_no_avx
+TNN_INSTALL_DIR=${TNN_ROOT_PATH}/scripts/release_linux_x86_cpu_openvino_no_avx
 OPENVINO_BUILD_SHARED="ON"
 DEBUG_MODE="OFF"
 OPENMP="ON"
+
+ENABLE_AVX="OFF"
 
 OPENVINO_INSTALL_PATH=${BUILD_DIR}/openvinoInstallShared
 if [ "${OPENVINO_BUILD_SHARED}" = "OFF" ]
@@ -189,7 +191,9 @@ cmake ${TNN_ROOT_PATH} \
     -DTNN_BENCHMARK_MODE=OFF \
     -DTNN_BUILD_SHARED=ON \
     -DTNN_CONVERTER_ENABLE=OFF \
-    -DDEBUG=${DEBUG_MODE}
+    -DDEBUG=${DEBUG_MODE} \
+    -DEABLE_AVX2=OFF \
+    -DENABLE_AVX512F=OFF
 
 echo "Building TNN ..."
 make -j8
